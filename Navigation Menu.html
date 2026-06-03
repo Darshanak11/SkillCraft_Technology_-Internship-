@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interactive Navigation</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+    }
+
+    /* Navigation Styles */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.5rem 5%;
+      background: transparent;
+      transition: all 0.3s ease;
+    }
+
+    /* Scrolled state */
+    .navbar.scrolled {
+      background: rgba(15, 23, 42, 0.95);
+      padding: 1rem 5%;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+      backdrop-filter: blur(10px);
+    }
+
+    .logo {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #fff;
+      text-decoration: none;
+      letter-spacing: -1px;
+      transition: transform 0.3s ease;
+    }
+
+    .logo:hover {
+      transform: scale(1.05);
+    }
+
+    .logo span {
+      color: #6366f1;
+    }
+
+    .nav-links {
+      display: flex;
+      list-style: none;
+      gap: 0.5rem;
+    }
+
+    .nav-links a {
+      position: relative;
+      display: block;
+      padding: 0.75rem 1.25rem;
+      color: rgba(255, 255, 255, 0.85);
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.95rem;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      overflow: hidden;
+    }
+
+    /* Hover background effect */
+    .nav-links a::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      opacity: 0;
+      transform: scale(0.8);
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      z-index: -1;
+    }
+
+    .nav-links a:hover {
+      color: #fff;
+      transform: translateY(-2px);
+    }
+
+    .nav-links a:hover::before {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    /* Underline animation */
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: 8px;
+      left: 50%;
+      width: 0;
+      height: 2px;
+      background: #fff;
+      transition: all 0.3s ease;
+      transform: translateX(-50%);
+    }
+
+    .nav-links a:hover::after {
+      width: 60%;
+    }
+
+    /* Active link style */
+    .nav-links a.active {
+      color: #fff;
+    }
+
+    .nav-links a.active::before {
+      opacity: 0.15;
+      transform: scale(1);
+    }
+
+    /* CTA Button */
+    .cta-button {
+      padding: 0.75rem 1.75rem;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: #fff;
+      border: none;
+      border-radius: 50px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+    }
+
+    .cta-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(99, 102, 241, 0.5);
+    }
+
+    /* Mobile menu toggle */
+    .menu-toggle {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      padding: 10px;
+    }
+
+    .menu-toggle span {
+      width: 25px;
+      height: 3px;
+      background: #fff;
+      border-radius: 3px;
+      transition: all 0.3s ease;
+    }
+
+    /* Demo content sections */
+    .hero {
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      color: #fff;
+      text-align: center;
+    }
+
+    .hero h1 {
+      font-size: 3.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .hero p {
+      font-size: 1.25rem;
+      opacity: 0.8;
+    }
+
+    .section {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 5rem 10%;
+    }
+
+    .section:nth-child(odd) {
+      background: #f8fafc;
+    }
+
+    .section:nth-child(even) {
+      background: #fff;
+    }
+
+    .section-content {
+      max-width: 800px;
+      text-align: center;
+    }
+
+    .section h2 {
+      font-size: 2.5rem;
+      color: #0f172a;
+      margin-bottom: 1.5rem;
+    }
+
+    .section p {
+      font-size: 1.1rem;
+      color: #64748b;
+      line-height: 1.8;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .menu-toggle {
+        display: flex;
+      }
+
+      .nav-links {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        width: 70%;
+        height: 100vh;
+        flex-direction: column;
+        background: #0f172a;
+        padding: 5rem 2rem;
+        transition: right 0.4s ease;
+      }
+
+      .nav-links.active {
+        right: 0;
+      }
+
+      .nav-links a {
+        padding: 1rem;
+        font-size: 1.1rem;
+      }
+
+      .cta-button {
+        display: none;
+      }
+
+      .hero h1 {
+        font-size: 2.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar" id="navbar">
+    <a href="#" class="logo">Brand<span>.</span></a>
+    
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#home" class="active">Home</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#services">Services</a></li>
+      <li><a href="#portfolio">Portfolio</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+
+    <button class="cta-button">Get Started</button>
+
+    <div class="menu-toggle" id="menuToggle">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </nav>
+
+  <section class="hero" id="home">
+    <div>
+      <h1>Interactive Navigation</h1>
+      <p>Scroll down to see the navbar transform</p>
+    </div>
+  </section>
+
+  <section class="section" id="about">
+    <div class="section-content">
+      <h2>About Us</h2>
+      <p>Watch how the navigation bar changes as you scroll. The transparent background becomes solid with a subtle blur effect, and the padding reduces for a more compact look.</p>
+    </div>
+  </section>
+
+  <section class="section" id="services">
+    <div class="section-content">
+      <h2>Our Services</h2>
+      <p>Hover over the navigation links to see the smooth gradient background animation and the underline effect that adds a polished touch to the interaction.</p>
+    </div>
+  </section>
+
+  <section class="section" id="portfolio">
+    <div class="section-content">
+      <h2>Portfolio</h2>
+      <p>The navigation stays fixed at the top of the viewport, ensuring easy access to all sections no matter how far you scroll down the page.</p>
+    </div>
+  </section>
+
+  <section class="section" id="contact">
+    <div class="section-content">
+      <h2>Contact</h2>
+      <p>This responsive design also includes a mobile-friendly hamburger menu that slides in from the right on smaller screens.</p>
+    </div>
+  </section>
+
+  <script>
+    const navbar = document.getElementById('navbar');
+    const navLinks = document.querySelectorAll('.nav-links a');
+    const menuToggle = document.getElementById('menuToggle');
+    const navLinksContainer = document.getElementById('navLinks');
+    const sections = document.querySelectorAll('section');
+
+    // Scroll effect - change navbar style
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 50) {
+        navbar.classList.add('scrolled');
+      } else {
+        navbar.classList.remove('scrolled');
+      }
+
+      // Update active link based on scroll position
+      let current = '';
+      sections.forEach(section => {
+        const sectionTop = section.offsetTop - 100;
+        const sectionHeight = section.offsetHeight;
+        if (window.scrollY >= sectionTop && window.scrollY < sectionTop + sectionHeight) {
+          current = section.getAttribute('id');
+        }
+      });
+
+      navLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href') === `#${current}`) {
+          link.classList.add('active');
+        }
+      });
+    });
+
+    // Mobile menu toggle
+    menuToggle.addEventListener('click', () => {
+      navLinksContainer.classList.toggle('active');
+    });
+
+    // Smooth scroll for nav links
+    navLinks.forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const targetId = link.getAttribute('href');
+        const targetSection = document.querySelector(targetId);
+        
+        targetSection.scrollIntoView({
+          behavior: 'smooth'
+        });
+
+        // Close mobile menu after clicking
+        navLinksContainer.classList.remove('active');
+      });
+    });
+  </script>
+</body>
+</html>
